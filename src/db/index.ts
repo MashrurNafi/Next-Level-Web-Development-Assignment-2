@@ -24,7 +24,7 @@ export const initDB = async() => {
           CREATE TABLE IF NOT EXISTS issues(
           id SERIAL PRIMARY KEY,
           title VARCHAR(150) NOT NULL,
-          description VARCHAR(20) NOT NULL,
+          description VARCHAR(100) NOT NULL,
           type VARCHAR(15) CHECK (type IN ('bug', 'feature_request')),
           status VARCHAR(11) DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved')),
           reporter_id INT NOT NULL,

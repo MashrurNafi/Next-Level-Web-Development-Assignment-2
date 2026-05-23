@@ -53,7 +53,6 @@ const getAllIssues = async (req: Request, res: Response) => {
         const reporterInfo =
           await issuesService.getReporterInfoFromDB(reporter_id);
         const reporter = reporterInfo.rows[0];
-        
 
         return {
           ...rest,
@@ -79,7 +78,38 @@ const getAllIssues = async (req: Request, res: Response) => {
   }
 };
 
+const getSingleIssue = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await issuesService.getSingleIssueFromDB(id as string);
+
+    const { reporter_id, created_at, updated_at, ...rest } = result.rows[0];
+    const reporterInfo = await issuesService.getReporterInfoFromDB(reporter_id);
+    const reporter = reporterInfo.rows[0];
+    const resultWithReporterInfo = {
+      ...rest,
+      reporter,
+      created_at,
+      updated_at
+    }
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: resultWithReporterInfo,
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
+
 export const issuesController = {
   createIssue,
   getAllIssues,
+  getSingleIssue,
 };

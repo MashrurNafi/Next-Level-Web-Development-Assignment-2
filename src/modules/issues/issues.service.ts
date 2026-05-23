@@ -33,8 +33,17 @@ const getReporterInfoFromDB = async (id: number) => {
   return result;
 };
 
+const getSingleIssueFromDB = async(id: string) => {
+  const result = await pool.query(`
+      SELECT * FROM issues WHERE id=$1
+    `,[id])
+
+  return result;
+}
+
 export const issuesService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
   getReporterInfoFromDB,
+  getSingleIssueFromDB
 };

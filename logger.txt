@@ -1,0 +1,1 @@
+Method -> GET Time -> 1779542464546 URL -> /api/issues?sort=newest

@@ -4,11 +4,13 @@ import { userRoute } from "./modules/user/user.route";
 import { authRoute } from "./modules/auth/auth.route";
 import { issuesRoute } from "./modules/issues/issues.route";
 import cors from "cors";
+import logger from "./middleware/logger";
 
 const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logger);
 
 app.use(cors({
   origin: 'http://localhost:5000',

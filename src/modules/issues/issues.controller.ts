@@ -90,8 +90,8 @@ const getSingleIssue = async (req: Request, res: Response) => {
       ...rest,
       reporter,
       created_at,
-      updated_at
-    }
+      updated_at,
+    };
 
     sendResponse(res, {
       statusCode: 200,
@@ -108,8 +108,76 @@ const getSingleIssue = async (req: Request, res: Response) => {
   }
 };
 
+const deleteIssue = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await issuesService.deleteIssueFromDB(id as string);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Issue deleted successfully",
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
+
+const updateIssue = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user as IUserJwtPayload;
+  try {
+    if (user.role === "maintainer") {
+      const result = await issuesService.updateIssueFromDB(
+        req.body,
+        id as string,
+      );
+
+      sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Issue updated successfully",
+        data: result.rows[0],
+      });
+    } else if (user.role === "contributor") {
+      const issue = await issuesService.getSingleIssueFromDB(id as string);
+      const reporterId = issue.rows[0].reporter_id;
+      const { status } = issue.rows[0];
+      if (user.id !== reporterId && status !== "open") {
+        throw new Error("Unauthorized Access!");
+      } else {
+        const result = await issuesService.updateIssueFromDB(
+          req.body,
+          id as string,
+        );
+
+        sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: "Issue updated successfully",
+          data: result.rows[0],
+        });
+      }
+    }
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
+
 export const issuesController = {
   createIssue,
   getAllIssues,
   getSingleIssue,
+  deleteIssue,
+  updateIssue
 };

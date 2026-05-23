@@ -33,17 +33,45 @@ const getReporterInfoFromDB = async (id: number) => {
   return result;
 };
 
-const getSingleIssueFromDB = async(id: string) => {
-  const result = await pool.query(`
+const getSingleIssueFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
       SELECT * FROM issues WHERE id=$1
-    `,[id])
+    `,
+    [id],
+  );
 
   return result;
-}
+};
+
+const deleteIssueFromDB = async (id: string) => {
+  await pool.query(`DELETE FROM issues WHERE id=$1`, [id]);
+};
+
+const updateIssueFromDB = async (payload: IIssues, id: string) => {
+  const { title, description, type, status } = payload;
+
+  const result = await pool.query(
+    `
+      UPDATE issues
+      SET title = COALESCE($1,title),
+      description = COALESCE($2,description),
+      type = COALESCE($3,type),
+      status = COALESCE($4, status)
+
+      WHERE id=$5 RETURNING *
+    `,
+    [title, description, type, status, id],
+  );
+
+  return result;
+};
 
 export const issuesService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
   getReporterInfoFromDB,
-  getSingleIssueFromDB
+  getSingleIssueFromDB,
+  deleteIssueFromDB,
+  updateIssueFromDB
 };

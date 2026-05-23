@@ -1,10 +1,11 @@
-import express, { type Response } from "express";
+import express, { type Request, type Response } from "express";
 import type { Application } from "express-serve-static-core";
 import { userRoute } from "./modules/user/user.route";
 import { authRoute } from "./modules/auth/auth.route";
 import { issuesRoute } from "./modules/issues/issues.route";
 import cors from "cors";
 import logger from "./middleware/logger";
+import sendResponse from "./utility/sendResponse";
 
 const app: Application = express();
 
@@ -12,14 +13,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
-app.use(cors({
-  origin: 'http://localhost:5000',
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5000",
+  }),
+);
 
-app.get("/", (res: Response) => {
-  res.status(200).json({
-    message: "Next Level Assignment 2",
-    author: "Mashrur",
+app.get("/", (req: Request, res: Response) => {
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Devpulse",
   });
 });
 
